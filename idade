@@ -1,0 +1,67 @@
+<?php 
+
+function anos($data_nasc, $formato, $texto){
+	/*
+	//Formato "Y-m-d"
+	echo anos("2000-01-01", "yyyy-mm-dd", "anos"); //Resultado: 10 anos
+	echo anos("2000-01-01", "aaaa-mm-dd", ""); //Resultado: 10 anos
+	echo anos("2000-01-01", "aaaa-mm-dd", "anos é a minha idade"); //Resultado: 10 anos é a minha idade
+
+	//Formato "d/m/Y"
+	anos("01/12/2000", "dd/mm/yyyy", "");
+	anos("01/12/2000", "dd/mm/aaaa", "");
+
+	//Formato "Y-m"
+	anos("2000-12", "yyyy-mm", "");
+	anos("2000-12", "aaaa-mm", "");
+
+	//Formato "m-Y"
+	anos("12-2000", "mm/aaaa", "anos");
+
+	Formato "Y"
+	anos("2000", "yyyy", "Texto que quiser");
+	anos("2000", "aaaa", "")
+
+	*/
+	if(empty($formato)){
+		return "Erro no formato";
+	} else {
+		$formato = strtolower($formato);
+		if($formato=="yyyy-mm-dd" or $formato=="aaaa-mm-dd"){ // 2000-02-01. Usa assim: anos("2000-01-01", "yyyy-mm-dd", "anos")
+			$datetime1 = new DateTime(date('Y-m-d'));
+			$datetime2 = new DateTime($data_nasc);
+			$interval = $datetime1->diff($datetime2);
+		} elseif($formato=="dd-mm-yyyy" or $formato=="dd-mm-aaaa" or $formato=="dd/mm/yyyy" or $formato=="dd/mm/aaaa"){ // 01-02-2000 ou 01/02/2000. Usa assim: anos("01/12/2000", "dd/mm/yyyy", "anos")
+			$datetime1 = new DateTime(date('Y-m-d'));
+			$datetime2 = new DateTime(date("Y-m-d", strtotime(str_replace("/", "-", $data_nasc))));
+			$interval = $datetime1->diff($datetime2);
+		} elseif($formato=="yyyy-mm" or $formato=="aaaa-mm"){ // 2000-20. (Ano 2000, Mes de Fevereiro). Usa assim: anos("2000-12", "yyyy-mm", "anos")
+			$datetime1 = new DateTime(date('Y-m-d'));
+			$datetime2 = new DateTime($data_nasc.date('-d'));
+			$interval = $datetime1->diff($datetime2);
+		} elseif($formato=="mm-yyyy" or $formato=="mm-aaaaa" or $formato=="mm/yyyy" or $formato=="mm/aaaaa"){ //02-2000 ou 02/2000(Fev de 2000). Usa assim: anos("12-2000", "mm/aaaa", "anos")
+			$datetime1 = new DateTime(date('Y-m-d'));
+			$datetime2 = new DateTime(date("Y-m-d", strtotime(str_replace("/", "-", date('d/').$data_nasc))));
+			$interval = $datetime1->diff($datetime2);
+		} elseif($formato=="yyyy" or $formato=="aaaaa"){// 2000 (Ano 2000). Usa assim: anos("2000", "yyyy", "anos")
+			$datetime1 = new DateTime(date('Y-m-d'));
+			$datetime2 = new DateTime($data_nasc.date("-m-d"));
+			$interval = $datetime1->diff($datetime2);
+		}
+		if(empty($texto) or $texto==""){
+			if($interval->format('%y')=="1"){
+				$ano_s = "ano";
+			} elseif($interval->format('%y')>1){
+				$ano_s = "anos";
+			} 
+			return $interval->format('%y '.$ano_s);
+			
+		} elseif($texto=="null" or $texto=="NULL"){
+			return $interval->format('%y');
+		} else {
+			return $interval->format('%y '.$texto);
+		}
+		
+	}
+}
+?>
